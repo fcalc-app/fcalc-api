@@ -78,6 +78,8 @@
 </head>
 
 <body>
+    <div id="formulaDisplay"
+        style="color: #888; font-size: 14px; margin-bottom: 25px; min-height: 16px; text-align: center;"></div>
     <div class="input-group">
         <input type="number" id="powerInput" placeholder=" " inputmode="decimal">
         <label for="powerInput">Мощность в кВт</label>
@@ -89,6 +91,7 @@
     <script>
         const powerInput = document.getElementById('powerInput');
         const flowInput = document.getElementById('flowInput');
+        const formulaDisplay = document.getElementById('formulaDisplay');
         const FACTOR = 8.374;
 
         function cleanInput(val) {
@@ -101,8 +104,10 @@
             if (!isNaN(power)) {
                 let flow = power / FACTOR;
                 flowInput.value = parseFloat(flow.toFixed(2));
+                formulaDisplay.textContent = `Формула: ${power} / ${FACTOR} = ${flowInput.value} м³/ч`;
             } else {
                 flowInput.value = '';
+                formulaDisplay.textContent = '';
             }
         });
 
@@ -112,8 +117,10 @@
             if (!isNaN(flow)) {
                 let power = flow * FACTOR;
                 powerInput.value = Math.round(power);
+                formulaDisplay.textContent = `Формула: ${flow} × ${FACTOR} = ${powerInput.value} кВт`;
             } else {
                 powerInput.value = '';
+                formulaDisplay.textContent = '';
             }
         });
     </script>
