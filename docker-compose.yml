@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  fcalc-backend:
+    build: .
+    container_name: fcalc-backend
+    restart: unless-stopped
+    networks:
+      - default
+      - infra_default
+
+networks:
+  infra_default:
+    external: true
