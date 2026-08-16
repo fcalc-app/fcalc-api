@@ -220,7 +220,6 @@
 <body>
 
     <div id="slide1" class="slide active">
-        <br>
         <div class="input-group" id="groupInitial">
             <input type="number" id="initialInput" placeholder=" " inputmode="decimal">
             <label for="initialInput">Начальные показания</label>
@@ -344,6 +343,9 @@
                 showToast("Укажите время");
                 return;
             }
+
+            audioTick.load();
+            audioEnd.load();
 
             selectedMins = parseInt(checkedRadio.value);
             timeLeft = selectedMins * 60;
