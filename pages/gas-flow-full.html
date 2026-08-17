@@ -39,7 +39,7 @@
             margin: 0;
             min-height: 100vh;
             -webkit-text-size-adjust: 100%;
-            padding: 16px calc(20px + env(safe-area-inset-right)) calc(36px + env(safe-area-inset-bottom)) calc(20px + env(safe-area-inset-left));
+            padding: 16px calc(20px + env(safe-area-inset-right)) calc(90px + env(safe-area-inset-bottom)) calc(20px + env(safe-area-inset-left));
         }
 
         .wrap {
@@ -243,7 +243,12 @@
             <span class="unit">м³/ч</span>
         </div>
 
-        <p class="eyebrow tight">Параметры топлива и агрегата</p>
+        <div class="panel">
+            <div class="caption">Расчёт</div>
+            <div class="formula" id="formula">Заполните мощность или расход</div>
+        </div>
+
+        <p class="eyebrow tight" style="margin-top: 34px;">Параметры топлива и агрегата</p>
 
         <div class="field">
             <input type="number" id="heat" placeholder=" " inputmode="decimal" value="8152">
@@ -258,11 +263,6 @@
         </div>
 
         <button class="btn-link" id="defaultsBtn">Вернуть значения по умолчанию</button>
-
-        <div class="panel" style="margin-top: 26px;">
-            <div class="caption">Расчёт</div>
-            <div class="formula" id="formula">Заполните мощность или расход</div>
-        </div>
     </div>
 
     <script>
@@ -346,6 +346,14 @@
             heat.value = DEFAULT_HEAT;
             eff.value = DEFAULT_EFF;
             update();
+        });
+
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('focus', function () {
+                setTimeout(() => {
+                    this.scrollIntoView({ block: 'center', behavior: 'smooth' });
+                }, 350);
+            });
         });
 
         update();
