@@ -1,14 +1,13 @@
-version: '3.8'
-
 services:
   fcalc-backend:
     build: .
+    pull_policy: build
     container_name: fcalc-backend
     restart: unless-stopped
     networks:
-      - default
-      - infra_default
+      - proxy
 
 networks:
-  infra_default:
+  proxy:
+    name: proxy
     external: true
