@@ -230,7 +230,7 @@
         <p class="eyebrow">Полный пересчёт</p>
 
         <div class="field">
-            <input type="number" id="power" placeholder=" " inputmode="decimal">
+            <input type="text" id="power" placeholder=" " inputmode="decimal">
             <label for="power">Мощность</label>
             <span class="unit">кВт</span>
         </div>
@@ -238,7 +238,7 @@
         <div class="relation" id="relation">коэффициент —</div>
 
         <div class="field">
-            <input type="number" id="flow" placeholder=" " inputmode="decimal">
+            <input type="text" id="flow" placeholder=" " inputmode="decimal">
             <label for="flow">Расход</label>
             <span class="unit">м³/ч</span>
         </div>
@@ -251,13 +251,13 @@
         <p class="eyebrow tight" style="margin-top: 34px;">Параметры топлива и агрегата</p>
 
         <div class="field">
-            <input type="number" id="heat" placeholder=" " inputmode="decimal" value="8152">
+            <input type="text" id="heat" placeholder=" " inputmode="decimal" value="8152">
             <label for="heat">Низшая теплота сгорания</label>
             <span class="unit">кал/м³</span>
         </div>
 
         <div class="field">
-            <input type="number" id="eff" placeholder=" " inputmode="decimal" value="90">
+            <input type="text" id="eff" placeholder=" " inputmode="decimal" value="90">
             <label for="eff">КПД агрегата брутто</label>
             <span class="unit">%</span>
         </div>
@@ -279,13 +279,26 @@
 
         let lastEdited = 'power';
 
-        function clean(val) {
-            return val.replace(/^0+(?=\d)/, '');
+        function removeLeadingZeros(input) {
+            const zeros = input.value.match(/^0+(?=\d)/);
+            if (zeros) {
+                input.setRangeText('', 0, zeros[0].length, 'preserve');
+            }
+        }
+
+        function parseDecimal(value) {
+            const normalized = value.trim().replace(/[,;]/g, '.');
+            if (!/^-?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?$/i.test(normalized)) {
+                return NaN;
+            }
+
+            const number = Number(normalized);
+            return Number.isFinite(number) ? number : NaN;
         }
 
         function multiplier() {
-            const h = parseFloat(heat.value) || 0;
-            const e = parseFloat(eff.value) || 0;
+            const h = parseDecimal(heat.value) || 0;
+            const e = parseDecimal(eff.value) || 0;
             return (h / 1000) * (e / 100) * 1.163;
         }
 
@@ -299,7 +312,7 @@
             }
 
             if (lastEdited === 'power') {
-                const value = parseFloat(power.value);
+                const value = parseDecimal(power.value);
                 if (isNaN(value)) {
                     flow.value = '';
                     formula.textContent = 'Заполните мощность или расход';
@@ -307,7 +320,7 @@
                 }
                 flow.value = parseFloat((value / k).toFixed(2));
             } else {
-                const value = parseFloat(flow.value);
+                const value = parseDecimal(flow.value);
                 if (isNaN(value)) {
                     power.value = '';
                     formula.textContent = 'Заполните мощность или расход';
@@ -316,29 +329,29 @@
                 power.value = parseFloat((value * k).toFixed(2));
             }
 
-            formula.textContent = flow.value + ' × (' + (parseFloat(heat.value) || 0) + ' / 1000) × ('
-                + (parseFloat(eff.value) || 0) + ' / 100) × 1.163 = ' + power.value + ' кВт';
+            formula.textContent = flow.value + ' × (' + (parseDecimal(heat.value) || 0) + ' / 1000) × ('
+                + (parseDecimal(eff.value) || 0) + ' / 100) × 1.163 = ' + power.value + ' кВт';
         }
 
         power.addEventListener('input', function () {
-            this.value = clean(this.value);
+            removeLeadingZeros(this);
             lastEdited = 'power';
             update();
         });
 
         flow.addEventListener('input', function () {
-            this.value = clean(this.value);
+            removeLeadingZeros(this);
             lastEdited = 'flow';
             update();
         });
 
         heat.addEventListener('input', function () {
-            this.value = clean(this.value);
+            removeLeadingZeros(this);
             update();
         });
 
         eff.addEventListener('input', function () {
-            this.value = clean(this.value);
+            removeLeadingZeros(this);
             update();
         });
 

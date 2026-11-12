@@ -340,7 +340,7 @@
             <p class="eyebrow">Шаг 1 · Замер</p>
 
             <div class="field" id="groupInitial">
-                <input type="number" id="initial" placeholder=" " inputmode="decimal">
+                <input type="text" id="initial" placeholder=" " inputmode="decimal">
                 <label for="initial">Начальные показания</label>
                 <span class="unit">м³</span>
             </div>
@@ -370,7 +370,7 @@
             <div class="recap" id="recap"></div>
 
             <div class="field">
-                <input type="number" id="final" placeholder=" " inputmode="decimal">
+                <input type="text" id="final" placeholder=" " inputmode="decimal">
                 <label for="final">Конечные показания</label>
                 <span class="unit">м³</span>
             </div>
@@ -426,16 +426,29 @@
         let selectedMins = 0;
         let toastTimeout;
 
-        function clean(val) {
-            return val.replace(/^0+(?=\d)/, '');
+        function removeLeadingZeros(input) {
+            const zeros = input.value.match(/^0+(?=\d)/);
+            if (zeros) {
+                input.setRangeText('', 0, zeros[0].length, 'preserve');
+            }
+        }
+
+        function parseDecimal(value) {
+            const normalized = value.trim().replace(/[,;]/g, '.');
+            if (!/^-?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?$/i.test(normalized)) {
+                return NaN;
+            }
+
+            const number = Number(normalized);
+            return Number.isFinite(number) ? number : NaN;
         }
 
         initial.addEventListener('input', function () {
-            this.value = clean(this.value);
+            removeLeadingZeros(this);
         });
 
         final.addEventListener('input', function () {
-            this.value = clean(this.value);
+            removeLeadingZeros(this);
         });
 
         function formatTime(sec) {
@@ -461,7 +474,7 @@
         }
 
         startBtn.addEventListener('click', () => {
-            if (!initial.value.trim()) {
+            if (isNaN(parseDecimal(initial.value))) {
                 showToast('Введите начальные показания');
                 return;
             }
@@ -524,13 +537,13 @@
         });
 
         calcBtn.addEventListener('click', () => {
-            if (!final.value.trim()) {
+            const to = parseDecimal(final.value);
+            if (isNaN(to)) {
                 showToast('Введите конечные показания');
                 return;
             }
 
-            const from = parseFloat(initial.value);
-            const to = parseFloat(final.value);
+            const from = parseDecimal(initial.value);
             const value = (to - from) * (60 / selectedMins);
 
             formula.textContent = '(' + to + ' − ' + from + ') × (60 / ' + selectedMins + ')';

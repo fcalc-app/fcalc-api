@@ -229,7 +229,7 @@
         <p class="eyebrow">Быстрый пересчёт</p>
 
         <div class="field">
-            <input type="number" id="power" placeholder=" " inputmode="decimal">
+            <input type="text" id="power" placeholder=" " inputmode="decimal">
             <label for="power">Мощность</label>
             <span class="unit">кВт</span>
         </div>
@@ -237,7 +237,7 @@
         <div class="relation">коэффициент 8.374</div>
 
         <div class="field">
-            <input type="number" id="flow" placeholder=" " inputmode="decimal">
+            <input type="text" id="flow" placeholder=" " inputmode="decimal">
             <label for="flow">Расход</label>
             <span class="unit">м³/ч</span>
         </div>
@@ -254,8 +254,21 @@
         const formula = document.getElementById('formula');
         const FACTOR = 8.374;
 
-        function clean(val) {
-            return val.replace(/^0+(?=\d)/, '');
+        function removeLeadingZeros(input) {
+            const zeros = input.value.match(/^0+(?=\d)/);
+            if (zeros) {
+                input.setRangeText('', 0, zeros[0].length, 'preserve');
+            }
+        }
+
+        function parseDecimal(value) {
+            const normalized = value.trim().replace(/[,;]/g, '.');
+            if (!/^-?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?$/i.test(normalized)) {
+                return NaN;
+            }
+
+            const number = Number(normalized);
+            return Number.isFinite(number) ? number : NaN;
         }
 
         function reset() {
@@ -263,8 +276,8 @@
         }
 
         power.addEventListener('input', function () {
-            this.value = clean(this.value);
-            const value = parseFloat(this.value);
+            removeLeadingZeros(this);
+            const value = parseDecimal(this.value);
             if (isNaN(value)) {
                 flow.value = '';
                 reset();
@@ -275,8 +288,8 @@
         });
 
         flow.addEventListener('input', function () {
-            this.value = clean(this.value);
-            const value = parseFloat(this.value);
+            removeLeadingZeros(this);
+            const value = parseDecimal(this.value);
             if (isNaN(value)) {
                 power.value = '';
                 reset();
